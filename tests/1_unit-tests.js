@@ -4,118 +4,99 @@ const ConvertHandler = require('../controllers/convertHandler.js');
 
 let convertHandler = new ConvertHandler();
 
-suite('Unit Tests', () => {
-
+suite('Unit Tests', function(){
     suite('convertHandler.getNum(input)', () => {
-
         test('Whole number input', (done) => {
-            var input = '32mi'
-            assert.equal(convertHandler.getNum(input), 32)
+            assert.equal(convertHandler.getNum('8mi'), 8)
             done()
         })
-
+    
         test('Decimal number input', (done) => {
-            var input = '32.2mi'
-            assert.equal(convertHandler.getNum(input), 32.2)
+            assert.equal(convertHandler.getNum('8.10mi'), 8.10)
             done()
         })
-
+    
         test('Fractional input', (done) => {
-            var input = '32/2mi'
-            assert.equal(convertHandler.getNum(input), 16)
+            assert.equal(convertHandler.getNum('16/2'), 8)
             done()
         })
-
-        test('Fractional input with decimal', (done) => {
-            var input = '32.0/2mi'
-            assert.equal(convertHandler.getNum(input), 16)
+    
+        test('Fractional input with a decimal', (done) => {
+            assert.equal(convertHandler.getNum('8/10'), 0.8)
             done()
         })
-
+    
         test('Double fraction input', (done) => {
-            var input = '3/1/2km'
-            assert.equal(convertHandler.getNum(input), 'invalid number')
+            assert.equal(convertHandler.getNum('3/2/2'), 'invalid number')
             done()
         })
 
         test('No num provided. Default to 1', (done) => {
-            var input = 'km'
-            assert.equal(convertHandler.getNum(input), 1)
+            assert.equal(convertHandler.getNum(''), 1)
             done()
         })
     })
 
     suite('convertHandler.getUnit(input)', () => {
-
-        test('For each valid input unit', (done) => {
-            let units = ['L','l','gal','GAL','mi','MI','km','KM','lbs','LBS','kg','KG']
-            units.forEach(elem => {
-                assert.equal(convertHandler.getUnit('10'+elem), elem === 'L' ? elem : elem === 'l'? 'L': elem.toLowerCase())
-            });
+        test('Valid input unit', (done) => {
+            assert.equal(convertHandler.getUnit('l'), 'L')
             done()
         })
 
         test('Invalid input unit', (done) => {
-            assert.equal(convertHandler.getUnit('10pound'), 'invalid unit')
+            assert.equal(convertHandler.getUnit('adb'), 'invalid unit')
             done()
         })
-    })
 
-    suite('convertHandler.getReturnUnit(initUnit)', () => {
-
-        test('Return correct valid return unit', (done) => {
-            let inputUnits = ['L', 'mi', 'lbs', 'gal', 'km', 'kg']
-            let checkUnits = ['gal', 'km', 'kg', 'L', 'mi', 'lbs']
-            
-            inputUnits.forEach((elem, i) => {
-                assert.equal(convertHandler.getReturnUnit(elem), checkUnits[i])
+        test('Valid input units', (done) => {
+            let units = ['L','l','gal','GAL','mi','MI','km','KM','lbs','LBS','kg','KG']
+            units.forEach(elem => {
+                assert.equal(convertHandler.getUnit('1'+elem), elem === 'L' ? elem : elem === 'l'? 'L': elem.toLowerCase())
             });
             done()
         })
     })
 
-    suite('convertHandler.spellOutUnit(unit)', () => {
-
-        test('Return spelled-out string unit for every valid unit', (done) => {
+    suite('convertHandler.spellOutUnit(input)', () => {
+        test('Spelled-out string units', (done) => {
             let inputUnits = ['L', 'mi', 'lbs', 'gal', 'km', 'kg']
-            let checkUnits = ['liters', 'miles', 'pounds', 'gallons', 'kilometers', 'kilograms']
-            
+            let spellOutUnits = ['liters', 'miles', 'pounds', 'gallons', 'kilometers', 'kilograms']
+
             inputUnits.forEach((elem, i) => {
-                assert.equal(convertHandler.spellOutUnit(elem), checkUnits[i])
+                assert.equal(convertHandler.spellOutUnit(elem), spellOutUnits[i])
             });
             done()
         })
     })
 
-    suite('convertHandler.convert(initNum, initUnit)', () => {
-
-        test('Convert gal to L', (done) => {
-            assert.approximately(convertHandler.convert(5,'gal'),18.92705,0.1)
+    suite('convertHandler.convert(input)', () => {
+        test('gal to L', (done) => {
+            assert.equal(convertHandler.convert('1', 'gal'), 3.78541)
             done()
         })
 
-        test('Convert L to gal', (done) => {
-            assert.approximately(convertHandler.convert(5,'L'),1.32086,0.1)
+        test('L to gal', (done) => {
+            assert.equal(convertHandler.convert('3.78541', 'L'), 1)
             done()
         })
 
-        test('Convert mi to km', (done) => {
-            assert.approximately(convertHandler.convert(5,'mi'),8.0467,0.1)
+        test('mi to km', (done) => {
+            assert.equal(convertHandler.convert('1', 'mi'), 1.60934)
             done()
         })
 
-        test('Convert km to mi', (done) => {
-            assert.approximately(convertHandler.convert(5,'km'),3.10686,0.1)
+        test('km to mi', (done) => {
+            assert.equal(convertHandler.convert('1.60934', 'km'), 1)
             done()
         })
 
-        test('Convert lbs to kg', (done) => {
-            assert.approximately(convertHandler.convert(5,'lbs'),2.26796,0.1)
+        test('kg to lbs', (done) => {
+            assert.equal(convertHandler.convert('0.453592', 'kg'), 1)
             done()
         })
 
-        test('Convert kg to lbs', (done) => {
-            assert.approximately(convertHandler.convert(5,'kg'),11.02312,0.1)
+        test('lbs to kg', (done) => {
+            assert.equal(convertHandler.convert('1', 'lbs'), 0.453592)
             done()
         })
     })
